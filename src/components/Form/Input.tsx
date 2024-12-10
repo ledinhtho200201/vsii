@@ -48,7 +48,7 @@ const CustomInput: React.FC<InputProps> = ({
             placeholder={placeholder}
             onChange={onChange}
             error={!!error}
-            helperText={error}
+            helperText={<div>{error}</div>}
             sx={{
                 "& .MuiInputBase-root": {
                     background: "#F3F3F3",

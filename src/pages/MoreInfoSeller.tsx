@@ -5,6 +5,7 @@ import CustomInput from "../components/Form/Input";
 import CustomCheckboxGroup from "../components/Form/CheckboxGroup";
 import AvatarUpload from "../components/Form/AvatarUpload";
 import FileUploadButton from "../components/Form/FileUploadButton";
+import { CircularProgress } from "@mui/material";
 
 const arrFieldInput = [
     { label: "Tên công ty", name: "companyName", placeholder: "Nhập tên công ty" },
@@ -27,6 +28,8 @@ const UpdateSeller: React.FC = () => {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [files, setFiles] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -87,8 +90,11 @@ const UpdateSeller: React.FC = () => {
             }
             return;
         }
-
-        alert("Form hợp lệ, gửi yêu cầu thành công!");
+        setIsSubmitting(true); // Bắt đầu loading
+        setTimeout(() => {
+            alert("Form hợp lệ, gửi yêu cầu thành công!");
+            setIsSubmitting(false); // Kết thúc loading
+        }, 2000); // Giả lập API call
     };
 
     return (
@@ -100,7 +106,10 @@ const UpdateSeller: React.FC = () => {
                 py: 5,
             }}
         >
-            <Container component="form" maxWidth="sm">
+            <Container component="form" maxWidth="sm" onSubmit={handleSubmit}
+                onDragOver={(e) => e.preventDefault()} // Ngăn kéo thả
+                onDrop={(e) => e.preventDefault()} // Ngăn kéo thả
+            >
                 <Box sx={{ backgroundColor: "#fff", borderRadius: "20px", p: 4 }}>
                     <Typography variant="h5" fontWeight="600">
                         Bổ sung thông tin
@@ -176,9 +185,39 @@ const UpdateSeller: React.FC = () => {
                         <Button variant="contained" sx={{ backgroundColor: "#F1F1EF", color: "#121110" }}>
                             Hủy
                         </Button>
-                        <Button type="submit" variant="contained" sx={{ backgroundColor: "#FFA21A", color: "#121110" }} onSubmit={handleSubmit}>
-                            Gửi yêu cầu
+                        <Button type="submit" variant="contained"
+                            sx={{
+                                backgroundColor: isSubmitting ? "#B3B3B3" : "#FFA21A",
+                                color: "#121110",
+                                opacity: isSubmitting ? 0.7 : 1,
+                                "&.Mui-disabled": {
+                                    cursor: "no-drop"
+                                },
+                            }}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <Box display="flex" alignItems="center" gap="8px">
+                                    <CircularProgress size={20} color="inherit" />
+                                    Đang gửi...
+                                </Box>
+                            ) : (
+                                "Gửi yêu cầu"
+                            )}
                         </Button>
+                    </Box>
+                    <Box display="flex" justifyContent="center" gap="8px" flexDirection="row" mt={3}>
+                        <Typography variant="body2" component="div">
+                            Bạn đang có vấn đề?{" "}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            component="span"
+                            color="primary"
+                            sx={{ cursor: "pointer" }}
+                        >
+                            Yêu cầu hỗ trợ
+                        </Typography>
                     </Box>
                 </Box>
             </Container>
@@ -187,3 +226,5 @@ const UpdateSeller: React.FC = () => {
 };
 
 export default UpdateSeller;
+
+
