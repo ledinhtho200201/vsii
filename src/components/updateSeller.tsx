@@ -258,7 +258,6 @@ const FormComponent: React.FC = () => {
                             color="primary"
                             sx={{ cursor: "pointer" }}
                         >
-                            Yêu cầu need hỗ trợ
                             feature 1
                         </Typography>
                     </Box>
