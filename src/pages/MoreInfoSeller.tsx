@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import bodyBg from "../assets/img/body_bg.jpg";
 import CustomInput from "../components/Form/Input";
@@ -6,6 +6,7 @@ import CustomCheckboxGroup from "../components/Form/CheckboxGroup";
 import AvatarUpload from "../components/Form/AvatarUpload";
 import FileUploadButton from "../components/Form/FileUploadButton";
 import { CircularProgress } from "@mui/material";
+import LoadingBar, { LoadingBarRef } from 'react-top-loading-bar';
 
 const arrFieldInput = [
     { label: "Tên công ty", name: "companyName", placeholder: "Nhập tên công ty" },
@@ -29,6 +30,7 @@ const UpdateSeller: React.FC = () => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [files, setFiles] = useState<File[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const ref = useRef<LoadingBarRef>(null)
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +80,7 @@ const UpdateSeller: React.FC = () => {
 
     const handleSubmit = (e: React.SyntheticEvent) => {
         e.preventDefault();
+        ref.current?.continuousStart()
         console.log('in here')
         const newErrors = validateForm();
 
@@ -93,135 +96,139 @@ const UpdateSeller: React.FC = () => {
         setIsSubmitting(true); // Bắt đầu loading
         setTimeout(() => {
             alert("Form hợp lệ, gửi yêu cầu thành công!");
+            ref.current?.complete()
             setIsSubmitting(false); // Kết thúc loading
         }, 2000); // Giả lập API call
     };
 
     return (
-        <Box
-            sx={{
-                backgroundImage: `url(${bodyBg})`,
-                backgroundSize: "cover",
-                minHeight: "100vh",
-                py: 5,
-            }}
-        >
-            <Container component="form" maxWidth="sm" onSubmit={handleSubmit}
-                onDragOver={(e) => e.preventDefault()} // Ngăn kéo thả
-                onDrop={(e) => e.preventDefault()} // Ngăn kéo thả
+        <>
+            <LoadingBar color='#f11946' ref={ref} />
+            <Box
+                sx={{
+                    backgroundImage: `url(${bodyBg})`,
+                    backgroundSize: "cover",
+                    minHeight: "100vh",
+                    py: 5,
+                }}
             >
-                <Box sx={{ backgroundColor: "#fff", borderRadius: "20px", p: 4 }}>
-                    <Typography variant="h5" fontWeight="600">
-                        Bổ sung thông tin
-                    </Typography>
-                    <Typography textAlign="left" sx={{ fontWeight: "400", fontSize: "16px", lineHeight: "19.36px", margin: "6px 0px 30px" }}>
-                        Để có thể mua-bán sản phẩm, bạn cần cung cấp bổ sung các thông tin sau
-                    </Typography>
-                    <Typography textAlign="left" sx={{ fontWeight: "600", fontSize: "16px" }}>
-                        Bổ sung thông tin cho tài khoản
-                    </Typography>
-                    <CustomCheckboxGroup value={formData.accountType} onChange={handleAccountTypeChange} />
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            marginTop: '30px',
-                            padding: "16px 12px",
-                            gap: '18px',
-                            border: "1px dashed #FFC900",
-                            borderRadius: '10px',
-                            backgroundColor: files.length === 2 ? "#FFEFD5" : "#FFEFD5",
-                            color: files.length === 2 ? "#121110" : "#3F3E3C",
-                            cursor: files.length === 2 ? "not-allowed" : "pointer",
-                        }}
-                    >
-                        <Box sx={{ display: "flex", flexDirection: "column" }}>
-                            <Typography sx={{
-                                fontSize: "14px",
-                                fontWeight: 500,
-                                lineHeight: "16.94px",
-                                color: "#121110",
-                                textAlign: "center"
-                            }}>
-                                Tải lên ảnh giấy phép kinh doanh
-                            </Typography>
-                            <Typography component="div" color="#61605D" sx={{
-                                fontSize: "12px",
-                                fontStyle: "italic",
-                                fontWeight: 400,
-                                lineHeight: "14.52px",
-                                textAlign: "center",
-                            }}>
-                                (Vui lòng chọn tối đa 02 ảnh)
-                            </Typography>
-                        </Box>
-                        {/* Nút upload */}
-                        <FileUploadButton
-                            onFileUpload={handleFileUpload}
-                            disabled={files.length === 2}
-                        />
-                    </Box>
-                    {/* Avatar upload */}
-                    <AvatarUpload files={files} onRemove={removeFile} />
-                    {arrFieldInput.map((field) => (
-                        <Box key={field.name} sx={{ mb: 2 }}>
-                            <CustomInput
-                                placeholder={field.placeholder}
-                                label={field.label}
-                                name={field.name}
-                                value={formData[field.name as keyof typeof formData]}
-                                type={field.type}
-                                error={!!errors[field.name]} // Boolean để hiển thị lỗi
-                                onChange={handleInputChange}
-                            />
-                            {errors[field.name] && (
-                                <Typography sx={{ color: "red", fontSize: "12px", mt: 0.5 }}>
-                                    {errors[field.name]}
-                                </Typography>
-                            )}
-                        </Box>
-                    ))}
-                    <Box display="flex" justifyContent="space-between" mt={3}>
-                        <Button variant="contained" sx={{ backgroundColor: "#F1F1EF", color: "#121110" }}>
-                            Hủy
-                        </Button>
-                        <Button type="submit" variant="contained"
+                <Container component="form" maxWidth="sm" onSubmit={handleSubmit}
+                    onDragOver={(e) => e.preventDefault()} // Ngăn kéo thả
+                    onDrop={(e) => e.preventDefault()} // Ngăn kéo thả
+                >
+                    <Box sx={{ backgroundColor: "#fff", borderRadius: "20px", p: 4 }}>
+                        <Typography variant="h5" fontWeight="600">
+                            Bổ sung thông tin
+                        </Typography>
+                        <Typography textAlign="left" sx={{ fontWeight: "400", fontSize: "16px", lineHeight: "19.36px", margin: "6px 0px 30px" }}>
+                            Để có thể mua-bán sản phẩm, bạn cần cung cấp bổ sung các thông tin sau
+                        </Typography>
+                        <Typography textAlign="left" sx={{ fontWeight: "600", fontSize: "16px" }}>
+                            Bổ sung thông tin cho tài khoản
+                        </Typography>
+                        <CustomCheckboxGroup value={formData.accountType} onChange={handleAccountTypeChange} />
+                        <Box
                             sx={{
-                                backgroundColor: isSubmitting ? "#B3B3B3" : "#FFA21A",
-                                color: "#121110",
-                                opacity: isSubmitting ? 0.7 : 1,
-                                "&.Mui-disabled": {
-                                    cursor: "no-drop"
-                                },
+                                display: "flex",
+                                justifyContent: "center",
+                                marginTop: '30px',
+                                padding: "16px 12px",
+                                gap: '18px',
+                                border: "1px dashed #FFC900",
+                                borderRadius: '10px',
+                                backgroundColor: files.length === 2 ? "#FFEFD5" : "#FFEFD5",
+                                color: files.length === 2 ? "#121110" : "#3F3E3C",
+                                cursor: files.length === 2 ? "not-allowed" : "pointer",
                             }}
-                            disabled={isSubmitting}
                         >
-                            {isSubmitting ? (
-                                <Box display="flex" alignItems="center" gap="8px">
-                                    <CircularProgress size={20} color="inherit" />
-                                    Đang gửi...
-                                </Box>
-                            ) : (
-                                "Gửi yêu cầu"
-                            )}
-                        </Button>
+                            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                <Typography sx={{
+                                    fontSize: "14px",
+                                    fontWeight: 500,
+                                    lineHeight: "16.94px",
+                                    color: "#121110",
+                                    textAlign: "center"
+                                }}>
+                                    Tải lên ảnh giấy phép kinh doanh
+                                </Typography>
+                                <Typography component="div" color="#61605D" sx={{
+                                    fontSize: "12px",
+                                    fontStyle: "italic",
+                                    fontWeight: 400,
+                                    lineHeight: "14.52px",
+                                    textAlign: "center",
+                                }}>
+                                    (Vui lòng chọn tối đa 02 ảnh)
+                                </Typography>
+                            </Box>
+                            {/* Nút upload */}
+                            <FileUploadButton
+                                onFileUpload={handleFileUpload}
+                                disabled={files.length === 2}
+                            />
+                        </Box>
+                        {/* Avatar upload */}
+                        <AvatarUpload files={files} onRemove={removeFile} />
+                        {arrFieldInput.map((field) => (
+                            <Box key={field.name} sx={{ mb: 2 }}>
+                                <CustomInput
+                                    placeholder={field.placeholder}
+                                    label={field.label}
+                                    name={field.name}
+                                    value={formData[field.name as keyof typeof formData]}
+                                    type={field.type}
+                                    error={!!errors[field.name]} // Boolean để hiển thị lỗi
+                                    onChange={handleInputChange}
+                                />
+                                {errors[field.name] && (
+                                    <Typography sx={{ color: "red", fontSize: "12px", mt: 0.5 }}>
+                                        {errors[field.name]}
+                                    </Typography>
+                                )}
+                            </Box>
+                        ))}
+                        <Box display="flex" justifyContent="space-between" mt={3}>
+                            <Button variant="contained" sx={{ backgroundColor: "#F1F1EF", color: "#121110" }}>
+                                Hủy
+                            </Button>
+                            <Button type="submit" variant="contained"
+                                sx={{
+                                    backgroundColor: isSubmitting ? "#B3B3B3" : "#FFA21A",
+                                    color: "#121110",
+                                    opacity: isSubmitting ? 0.7 : 1,
+                                    "&.Mui-disabled": {
+                                        cursor: "no-drop"
+                                    },
+                                }}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <Box display="flex" alignItems="center" gap="8px">
+                                        <CircularProgress size={20} color="inherit" />
+                                        Đang gửi...
+                                    </Box>
+                                ) : (
+                                    "Gửi yêu cầu"
+                                )}
+                            </Button>
+                        </Box>
+                        <Box display="flex" justifyContent="center" gap="8px" flexDirection="row" mt={3}>
+                            <Typography variant="body2" component="div">
+                                Bạn đang có vấn đề?{" "}
+                            </Typography>
+                            <Typography
+                                variant="body2"
+                                component="span"
+                                color="primary"
+                                sx={{ cursor: "pointer" }}
+                            >
+                                Yêu cầu hỗ trợ
+                            </Typography>
+                        </Box>
                     </Box>
-                    <Box display="flex" justifyContent="center" gap="8px" flexDirection="row" mt={3}>
-                        <Typography variant="body2" component="div">
-                            Bạn đang có vấn đề?{" "}
-                        </Typography>
-                        <Typography
-                            variant="body2"
-                            component="span"
-                            color="primary"
-                            sx={{ cursor: "pointer" }}
-                        >
-                            Yêu cầu hỗ trợ
-                        </Typography>
-                    </Box>
-                </Box>
-            </Container>
-        </Box>
+                </Container>
+            </Box>
+        </>
     );
 };
 
