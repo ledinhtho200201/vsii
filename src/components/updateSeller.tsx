@@ -259,7 +259,7 @@ const FormComponent: React.FC = () => {
                             sx={{ cursor: "pointer" }}
                         >
                             Yêu cầu hỗ trợ
-                            them nay
+                            feature 1
                         </Typography>
                     </Box>
                 </Container >
